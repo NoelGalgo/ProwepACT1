@@ -1,6 +1,5 @@
-
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import parse_qsl, urlparse
+from urllib.parse import parse_qsl, urlparse, parse_qs
 
 
 class WebRequestHandler(BaseHTTPRequestHandler):
@@ -21,6 +20,10 @@ class WebRequestHandler(BaseHTTPRequestHandler):
         """
 
     def do_GET(self):
+        parsed = urlparse(self.path)
+        ruta = parsed.path
+        query = parse_qs(parsed.query)
+
         self.send_response(200)
         self.send_header("Content-Type", "text/html")
         self.end_headers()

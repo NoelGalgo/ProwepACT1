@@ -4,31 +4,30 @@ from urllib.parse import parse_qsl, urlparse, parse_qs
 
 class WebRequestHandler(BaseHTTPRequestHandler):
 
-    def url(self):
-        return urlparse(self.path)
+    contenido = {
+        "/": """
+        <html>
+            <h1>Inicio</h1>
+            <a href="/proyecto/1">Proyecto 1</a><br>
+            <a href="/proyecto/2">Proyecto 2</a><br>
+            <a href="/proyecto/3">Proyecto 3</a>
+        </html>
+        """,
 
-    def query_data(self):
-        return dict(parse_qsl(self.url().query))
-
-    def get_response(self):
-        return f"""
-        <h1> Hola Web </h1>
-        <p> URL Parse Result: {self.url()} </p>
-        <p> Path Original: {self.path} </p>
-        <p> Headers: {self.headers} </p>
-        <p> Query: {self.query_data()} </p>
-        """
+        "/proyecto/1": "<html><h1>Proyecto 1</h1></html>",
+        "/proyecto/2": "<html><h1>Proyecto 2</h1></html>",
+        "/proyecto/3": "<html><h1>Proyecto 3</h1></html>",
+    }
 
     def do_GET(self):
 
-        if self.path == "/":
-            with open("home.html", "r", encoding="utf-8") as f:
-                html = f.read()
+        ruta = self.path
 
+        if ruta in self.contenido:
             self.send_response(200)
             self.send_header("Content-Type", "text/html")
             self.end_headers()
-            self.wfile.write(html.encode("utf-8"))
+            self.wfile.write(self.contenido[ruta].encode("utf-8"))
 
         else:
             self.send_response(404)
@@ -41,3 +40,4 @@ if __name__ == "__main__":
     print("Servidor escuchando en http://localhost:8000")
     server = HTTPServer(("localhost", 8000), WebRequestHandler)
     server.serve_forever()
+
